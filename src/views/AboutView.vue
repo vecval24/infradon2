@@ -140,7 +140,6 @@ export default {
 
     getFakePost() {
       return {
-        _id: v4(),
         post_name: "post_name" + new Date().toISOString(),
         post_content: "post_content",
         attributes: {
@@ -153,7 +152,7 @@ export default {
       const document = this.getFakePost();
       const db = ref(this.storage).value;
       if (db) {
-        db.put
+        db.post
           .bind(this)(document)
           .then(() => {
             console.log("Add ok");
@@ -184,6 +183,6 @@ export default {
         </div>
       </li>
     </ul>
-    <button>Add</button>
+    <button @click="postDocument">Add</button>
   </div>
 </template>
