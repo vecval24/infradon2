@@ -22,56 +22,27 @@ export default {
       postsData: [] as Post[],
       document: null as Post | null,
       storage: null as PouchDB.Database | null,
+      remoteDB: null as PouchDB.Database | null, // Ajouter la référence à la DB distante
     };
   },
 
   mounted() {
     this.initDatabase();
     this.fetchData();
-
-    /*
-    this.createData({
-      _id: "1",
-      doc: {
-        post_name: "Post 1",
-        post_content: "Contenu du post 1",
-        attributes: {
-          creation_date: "2021-09-01",
-          modified: "not yet",
-        },
-      },
-    });
-
-    this.updateData({
-      _id: "1",
-      doc: {
-        post_name: "Post 1",
-        post_content: "Contenu du post 1",
-        attributes: {
-          creation_date: "2021-09-01",
-          modified: "yes",
-        },
-      },
-    });
-    */
+    this.setupReplication(); // Configuration de la réplication
   },
 
   methods: {
     async updateData(document: Post) {
       const db = this.storage;
-
-      // Vérifier si le stockage est bien défini
       if (!db) {
         console.error("Le stockage n'est pas défini.");
         return;
       }
 
       try {
-        // Récupérer le document existant pour obtenir son _rev (version)
         const existingDoc = await db.get(document._id);
         document._rev = existingDoc._rev; // Assigner _rev pour la mise à jour
-
-        // Mettre à jour le document
         await db.put(document);
         console.log("Mise à jour réussie");
       } catch (error) {
@@ -80,40 +51,30 @@ export default {
     },
 
     async deleteData(document: Post) {
-      console.log("entrée dans la méthode delete");
       const db = this.storage;
-
-      // Vérifier si le stockage est bien défini
       if (!db) {
         console.error("Le stockage n'est pas défini.");
         return;
       }
 
       try {
-        // Récupérer le document existant pour obtenir son _rev
         const existingDoc = await db.get(document._id);
         await db.remove(existingDoc._id, existingDoc._rev);
         console.log("Suppression réussie");
       } catch (error) {
-        console.log("catch delete");
         console.error("Erreur lors de la suppression", error);
       }
     },
 
     async deletePost(post: Post) {
-      console.log("Suppression du post avec _id:", post._id);
-
       if (!this.storage) {
         console.error("Base de données non initialisée");
         return;
       }
 
       try {
-        // Suppression en utilisant doc directement
         const response = await this.storage.remove(post);
         console.log("Post supprimé avec succès :", response);
-
-        // Recharger les données après suppression
         this.fetchData();
       } catch (error) {
         console.error("Erreur lors de la suppression du post :", error);
@@ -122,21 +83,15 @@ export default {
 
     fetchData() {
       const storage = ref(this.storage);
-      const self = this;
       if (storage.value) {
         storage.value
-          .allDocs({
-            include_docs: true,
-            attachments: true,
+          .allDocs({ include_docs: true, attachments: true })
+          .then((result) => {
+            console.log("fetchData success", result);
+            this.postsData = result.rows;
           })
-          .then(
-            function (result: any) {
-              console.log("fetchData success", result);
-              self.postsData = result.rows;
-            }.bind(this),
-          )
-          .catch(function (error: any) {
-            console.log("fetchData error", error);
+          .catch((error) => {
+            console.error("fetchData error", error);
           });
       }
     },
@@ -148,27 +103,24 @@ export default {
           db.value?.post(document);
         }
       } catch (e) {
-        throw new Error("Impossible de modifer le document");
+        console.error("Impossible de modifier le document", e);
       }
     },
 
     initDatabase() {
       const db = new PouchDB("http://admin:admin@localhost:5984/database");
-      if (db) {
-        console.log("Connected to collection 'post'");
-      } else {
-        console.warn("Something went wrong");
-      }
       this.storage = db;
+      this.remoteDB = new PouchDB(
+        "http://admin:admin@localhost:5984/database_remote",
+      );
+      console.log("Connected to local and remote databases");
     },
 
     getFakePost() {
       return {
         post_name: "post_name" + new Date().toISOString(),
         post_content: "post_content",
-        attributes: {
-          creation_date: new Date().toISOString(),
-        },
+        attributes: { creation_date: new Date().toISOString() },
       };
     },
 
@@ -176,28 +128,62 @@ export default {
       const document = this.getFakePost();
       const db = ref(this.storage).value;
       if (db) {
-        db.post
-          .bind(this)(document)
+        db.post(document)
           .then(() => {
             console.log("Add ok");
             this.fetchData();
           })
           .catch((error) => {
-            console.log("Add ko", error);
+            console.error("Add ko", error);
           });
       }
     },
-    updateLocalDatabase() {
-      const db = ref(this.db).value;
-      if (db) {
-        db.replicate.from
-          .bind(this)(this.remoteDB)
+
+    // Nouvelle méthode pour configurer la réplication
+    setupReplication() {
+      const db = this.storage;
+      const remoteDb = this.remoteDB;
+
+      if (db && remoteDb) {
+        // Réplication bidirectionnelle avec gestion des erreurs
+        db.replicate
+          .to(remoteDb)
           .on("complete", () => {
-            console.log("on replicate complete");
+            console.log(
+              "Réplication vers la base distante terminée avec succès.",
+            );
+          })
+          .on("error", (err) => {
+            console.error("Erreur de réplication vers la base distante", err);
+          });
+
+        remoteDb.replicate
+          .to(db)
+          .on("complete", () => {
+            console.log(
+              "Réplication depuis la base distante terminée avec succès.",
+            );
+          })
+          .on("error", (err) => {
+            console.error("Erreur de réplication depuis la base distante", err);
+          });
+      }
+    },
+
+    updateLocalDatabase() {
+      const db = ref(this.storage).value;
+      if (db) {
+        db.replicate
+          .from(this.remoteDB)
+          .on("complete", () => {
+            console.log("Réplication complète depuis la base distante.");
             this.fetchData();
           })
-          .on("error", function (error) {
-            console.log("error", error);
+          .on("error", (error) => {
+            console.error(
+              "Erreur lors de la réplication depuis la base distante",
+              error,
+            );
           });
       }
     },
@@ -211,8 +197,8 @@ export default {
     <ul>
       <li v-for="post in postsData" :key="post._id">
         <div class="ucfirst">
-          {{ post.doc.post_name
-          }}<em
+          {{ post.doc.post_name }}
+          <em
             style="font-size: x-small"
             v-if="post.doc.attributes?.creation_date"
           >

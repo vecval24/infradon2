@@ -10,6 +10,9 @@
         class="reminder-input"
       />
       <button @click="addReminder" class="add-button">Ajouter</button>
+      <button @click="updateLocalDatabase" class="update-button">
+        Mettre à jour
+      </button>
     </div>
 
     <!-- Liste des rappels -->
@@ -41,6 +44,7 @@ export default {
       newReminderName: "", // Nom du nouveau rappel
       reminders: [], // Liste des rappels
       db: null, // Instance de la base de données PouchDB
+      remoteDB: null, // Base de données distante
     };
   },
   mounted() {
@@ -51,6 +55,9 @@ export default {
     // Initialisation de la base de données PouchDB
     async initDatabase() {
       this.db = new PouchDB("http://admin:admin@localhost:5984/reminders");
+      this.remoteDB = new PouchDB(
+        "http://admin:admin@localhost:5984/reminders_remote",
+      );
     },
 
     // Ajouter un rappel
@@ -96,6 +103,20 @@ export default {
         console.error("Erreur lors du chargement des rappels", error);
       }
     },
+
+    // Mettre à jour la base de données locale en la répliquant depuis la base distante
+    async updateLocalDatabase() {
+      try {
+        await this.db.replicate.from(this.remoteDB); // Réplication depuis la base distante
+        this.fetchReminders(); // Recharger les rappels après mise à jour
+        console.log("Base de données locale mise à jour avec succès !");
+      } catch (error) {
+        console.error(
+          "Erreur lors de la mise à jour de la base de données locale",
+          error,
+        );
+      }
+    },
   },
 };
 </script>
@@ -137,6 +158,21 @@ export default {
 
 .add-button:hover {
   background-color: #45a049;
+}
+
+.update-button {
+  margin-top: 10px;
+  margin-left: 5px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.update-button:hover {
+  background-color: #0056b3;
 }
 
 .reminders-display {
