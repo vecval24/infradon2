@@ -13,6 +13,7 @@
       <button @click="updateLocalDatabase" class="update-button">
         Mettre à jour
       </button>
+      <button @click="listIndexes">Afficher les index</button>
     </div>
 
     <!-- Liste des rappels -->
