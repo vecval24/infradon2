@@ -100,6 +100,26 @@ export default {
       }
     },
 
+    async deletePost(post: Post) {
+      console.log("Suppression du post avec _id:", post._id);
+
+      if (!this.storage) {
+        console.error("Base de données non initialisée");
+        return;
+      }
+
+      try {
+        // Suppression en utilisant doc directement
+        const response = await this.storage.remove(post);
+        console.log("Post supprimé avec succès :", response);
+
+        // Recharger les données après suppression
+        this.fetchData();
+      } catch (error) {
+        console.error("Erreur lors de la suppression du post :", error);
+      }
+    },
+
     fetchData() {
       const storage = ref(this.storage);
       const self = this;
@@ -198,6 +218,7 @@ export default {
           >
             - {{ post.doc.attributes?.creation_date }}
           </em>
+          <button @click="deletePost(post)" class="delete-post">Delete</button>
         </div>
       </li>
     </ul>
