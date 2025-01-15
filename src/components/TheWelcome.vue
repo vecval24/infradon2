@@ -1,6 +1,9 @@
 <script lang="ts">
 import { ref } from "vue";
 import PouchDB from "pouchdb";
+import pouchdbFind from "pouchdb-find";
+
+PouchDB.plugin(pouchdbFind);
 
 declare interface Post {
   _id: string;
@@ -107,12 +110,25 @@ export default {
       }
     },
 
-    initDatabase() {
+    async initDatabase() {
       const db = new PouchDB("http://admin:admin@localhost:5984/database");
       this.storage = db;
       this.remoteDB = new PouchDB(
         "http://admin:admin@localhost:5984/database_remote",
       );
+      
+      // Création d'un index sur les champs 'post_name' et 'creation_date'
+      try {
+        await db.createIndex({
+          index: {
+            fields: ['doc.post_name', 'doc.attributes.creation_date'],
+          },
+        });
+        console.log("Index créé sur 'post_name' et 'creation_date'");
+      } catch (err) {
+        console.error("Erreur lors de la création de l'index", err);
+      }
+
       console.log("Connected to local and remote databases");
     },
 
@@ -189,26 +205,3 @@ export default {
     },
   },
 };
-</script>
-
-<template>
-  <div>
-    <h1>Nombre de post: {{ postsData.length }}</h1>
-    <ul>
-      <li v-for="post in postsData" :key="post._id">
-        <div class="ucfirst">
-          {{ post.doc.post_name }}
-          <em
-            style="font-size: x-small"
-            v-if="post.doc.attributes?.creation_date"
-          >
-            - {{ post.doc.attributes?.creation_date }}
-          </em>
-          <button @click="deletePost(post)" class="delete-post">Delete</button>
-        </div>
-      </li>
-    </ul>
-    <button @click="postDocument">Add</button>
-    <button @click="updateLocalDatabase">Update</button>
-  </div>
-</template>
