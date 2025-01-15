@@ -37,6 +37,7 @@
 <script>
 import { ref } from "vue";
 import PouchDB from "pouchdb";
+import { result } from "lodash";
 
 export default {
   data() {
@@ -107,7 +108,17 @@ export default {
     // Mettre à jour la base de données locale en la répliquant depuis la base distante
     async updateLocalDatabase() {
       try {
-        await this.db.replicate.from(this.remoteDB); // Réplication depuis la base distante
+        console.log(
+          "Démarrage de la réplication de la base locale vers la base distante...",
+        );
+        const result = await this.db.replicate.to(this.remoteDB);
+        console.log("Réplication vers la base distante réussie", result);
+
+        // Optionnellement, on peut aussi vérifier l'état de la réplication inverse
+        console.log("Démarrage de la réplication depuis la base distante...");
+        await this.db.replicate.from(this.remoteDB);
+        console.log("Réplication depuis la base distante réussie");
+
         this.fetchReminders(); // Recharger les rappels après mise à jour
         console.log("Base de données locale mise à jour avec succès !");
       } catch (error) {
