@@ -1,4 +1,4 @@
-/* color palette from <https://github.com/vuejs/theme> */
+/* Palette de couleurs issue de <https://github.com/vuejs/theme> */
 :root {
   --vt-c-white: #ffffff;
   --vt-c-white-soft: #f8f8f8;
@@ -21,7 +21,7 @@
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 }
 
-/* semantic color variables for this project */
+/* Variables sémantiques pour ce projet */
 :root {
   --color-background: var(--vt-c-white);
   --color-background-soft: var(--vt-c-white-soft);
@@ -50,9 +50,7 @@
   }
 }
 
-*,
-*::before,
-*::after {
+* {
   box-sizing: border-box;
   margin: 0;
   font-weight: normal;
@@ -60,27 +58,116 @@
 
 body {
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   color: var(--color-text);
-  background: var(--color-background);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
+  background: rgb(231, 231, 231);
+  transition: color 0.5s, background-color 0.5s;
   line-height: 1.6;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   font-size: 15px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+  color: black;
+  font-weight: bolder;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 40px;
+}
+
+h2 {
+  color: black;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.reminder-list-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 1500px;
+}
+
+.create-reminder,
+.reminders-display {
+  flex: 1;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px; /* Coins légèrement arrondis */
+  background-color: var(--vt-c-white); /* Couleur blanche pour les box */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Effet d'ombre */
+  max-width: 500px;
+}
+
+.reminder-input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  
+}
+
+button {
+  transition: background-color 0.3s ease;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.add-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.add-button:hover {
+  background-color: #45a049;
+}
+
+.update-button {
+  margin-top: 10px;
+  background-color: #007bff;
+  color: white;
+}
+
+.update-button:hover {
+  background-color: #0056b3;
+}
+
+.reminder-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  margin: 5px 0;
+  background-color: lightpink;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: white;
+  font-weight: 600;
+}
+
+
+.delete-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #e53935;
 }

@@ -13,7 +13,7 @@
       <button @click="updateLocalDatabase" class="update-button">
         Mettre à jour
       </button>
-      <button @click="listIndexes">Afficher les index</button>
+      <!-- <button @click="listIndexes">Afficher les index</button> -->
     </div>
 
     <!-- Liste des rappels -->
@@ -132,88 +132,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* Styles pour le formulaire et la liste de rappels */
-.reminder-list-container {
-  display: flex;
-  justify-content: space-between;
-  padding: 20px;
-  color: black;
-  font-weight: 800px;
-}
-
-.create-reminder {
-  width: 40%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f8f8f8;
-}
-
-.reminder-input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.add-button {
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: black;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.add-button:hover {
-  background-color: #45a049;
-}
-
-.update-button {
-  margin-top: 10px;
-  margin-left: 5px;
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.update-button:hover {
-  background-color: #0056b3;
-}
-
-.reminders-display {
-  width: 55%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f8f8f8;
-}
-
-.reminder-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px;
-  margin: 5px 0;
-  background-color: #e8e8e8;
-  border-radius: 5px;
-  color: black;
-}
-
-.delete-button {
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.delete-button:hover {
-  background-color: #e53935;
-}
-</style>

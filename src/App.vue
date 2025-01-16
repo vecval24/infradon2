@@ -4,13 +4,7 @@ import ReminderList from "./components/ReminderList.vue";
 
 <template>
   <header>
-    <img
-      alt="Vue logo"
-      class="logo"
-      src="./assets/logo.svg"
-      width="125"
-      height="125"
-    />
+    <h1>Ma liste de rappels</h1>
   </header>
   <main>
     <ReminderList />
