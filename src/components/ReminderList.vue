@@ -2,6 +2,16 @@
   <div class="reminder-list-container">
     <!-- Formulaire de création des rappels -->
     <div class="create-reminder">
+      <div class="search-bar">
+        <h2>Barre de recherche</h2>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Rechercher un rappel"
+          class="search-input"
+        />
+        <button @click="filterReminders" class="add-button">Rechercher</button>
+      </div>
       <h2>Ajouter un rappel</h2>
       <input
         v-model="newReminderName"
@@ -39,12 +49,16 @@
 import { ref } from "vue";
 import PouchDB from "pouchdb";
 import { result } from "lodash";
+import pouchdbFind from "pouchdb-find";
+
+PouchDB.plugin(pouchdbFind);
 
 export default {
   data() {
     return {
       newReminderName: "", // Nom du nouveau rappel
       reminders: [], // Liste des rappels
+      searchQuery: "", // Requête de recherche
       db: null, // Instance de la base de données PouchDB
       remoteDB: null, // Base de données distante
     };
@@ -53,6 +67,20 @@ export default {
     this.initDatabase(); // Initialiser la base de données lors du montage du composant
     this.fetchReminders(); // Charger les rappels existants
   },
+
+  computed: {
+    // Filtrer les rappels en fonction de la barre de recherche
+    filteredReminders() {
+      if (!this.searchQuery) {
+        return this.reminders; // Si la barre de recherche est vide, afficher tous les rappels
+      }
+      const lowerCaseQuery = this.searchQuery.toLowerCase();
+      return this.reminders.filter((reminder) =>
+        reminder.name.toLowerCase().includes(lowerCaseQuery),
+      );
+    },
+  },
+
   methods: {
     // Initialisation de la base de données PouchDB
     async initDatabase() {
@@ -60,6 +88,21 @@ export default {
       this.remoteDB = new PouchDB(
         "http://admin:admin@localhost:5984/reminders_remote",
       );
+      await this.createIndex();
+    },
+
+    // Créer un index sur le champ 'name'
+    async createIndex() {
+      try {
+        const result = await this.db.createIndex({
+          index: {
+            fields: ["name"], // Champ sur lequel l'index sera créé
+          },
+        });
+        console.log("Index créé avec succès", result);
+      } catch (err) {
+        console.error("Erreur lors de la création de l'index", err);
+      }
     },
 
     // Ajouter un rappel
@@ -100,7 +143,9 @@ export default {
         const result = await this.db.allDocs({
           include_docs: true,
         });
-        this.reminders = result.rows.map((row) => row.doc); // Extraire les documents
+        this.reminders = result.rows
+          .map((row) => row.doc)
+          .filter((reminder) => reminder.name && reminder.name.trim() !== "");
       } catch (error) {
         console.error("Erreur lors du chargement des rappels", error);
       }

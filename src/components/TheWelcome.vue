@@ -84,34 +84,6 @@ export default {
       }
     },
 
-    async createIndex() {
-  console.log("Création de l'index...");
-  try {
-    const result = await this.storage.createIndex({
-      index: {
-        fields: ['doc.post_name', 'doc.attributes.creation_date']
-      }
-    });
-    console.log("Résultat de la création de l'index :", result);  // Affiche le résultat de la création de l'index
-    this.listIndexes(); // Vérifie les indices après la création
-  } catch (err) {
-    console.error("Erreur lors de la création de l'index :", err);
-  }
-},
-
-async listIndexes() {
-  const db = this.storage;
-  if (db) {
-    try {
-      const indexes = await db.listIndexes();
-      console.log("Liste des index : ", indexes);
-      this.indexes = indexes;
-    } catch (error) {
-      console.error("Erreur lors de la récupération des index :", error);
-    }
-  }
-},
-
 
     fetchData() {
       const storage = ref(this.storage);
