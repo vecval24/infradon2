@@ -31,7 +31,7 @@
       <h2>Mes rappels</h2>
       <ul>
         <li
-          v-for="reminder in reminders"
+          v-for="reminder in filteredReminders"
           :key="reminder._id"
           class="reminder-item"
         >
