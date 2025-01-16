@@ -22,7 +22,6 @@
       <button @click="updateLocalDatabase" class="update-button">
         Mettre à jour
       </button>
-      <!-- <button @click="listIndexes">Afficher les index</button> -->
     </div>
 
     <!-- Liste des rappels -->
@@ -150,7 +149,7 @@ export default {
       }
     },
 
-    // Mettre à jour la base de données locale en la répliquant depuis la base distante
+    // Mise à jour de la base de données locale en la répliquant depuis la base distante
     async updateLocalDatabase() {
       try {
         console.log(
@@ -159,7 +158,7 @@ export default {
         const result = await this.db.replicate.to(this.remoteDB);
         console.log("Réplication vers la base distante réussie", result);
 
-        // Optionnellement, on peut aussi vérifier l'état de la réplication inverse
+        //vérifier l'état de la réplication inverse
         console.log("Démarrage de la réplication depuis la base distante...");
         await this.db.replicate.from(this.remoteDB);
         console.log("Réplication depuis la base distante réussie");

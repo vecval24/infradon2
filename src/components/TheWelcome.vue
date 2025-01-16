@@ -25,7 +25,7 @@ export default {
       postsData: [] as Post[],
       document: null as Post | null,
       storage: null as PouchDB.Database | null,
-      remoteDB: null as PouchDB.Database | null, // Ajouter la référence à la DB distante
+      remoteDB: null as PouchDB.Database | null, 
     };
   },
 
@@ -156,7 +156,7 @@ export default {
       }
     },
 
-    // Nouvelle méthode pour configurer la réplication
+    // Méthode pour la réplication
     setupReplication() {
       const db = this.storage;
       const remoteDb = this.remoteDB;
