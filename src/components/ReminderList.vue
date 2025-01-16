@@ -3,16 +3,15 @@
     <!-- Formulaire de création des rappels -->
     <div class="create-reminder">
       <div class="search-bar">
-        <h2>Barre de recherche</h2>
+        <h2>🔎 Barre de recherche</h2>
         <input
           v-model="searchQuery"
           type="text"
           placeholder="Rechercher un rappel"
           class="search-input"
         />
-        <button @click="filterReminders" class="add-button">Rechercher</button>
       </div>
-      <h2>Ajouter un rappel</h2>
+      <h2>✏️ Ajouter un rappel</h2>
       <input
         v-model="newReminderName"
         type="text"
@@ -28,7 +27,7 @@
 
     <!-- Liste des rappels -->
     <div class="reminders-display">
-      <h2>Mes rappels</h2>
+      <h2>📋 Mes rappels</h2>
       <ul>
         <li
           v-for="reminder in filteredReminders"
